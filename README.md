@@ -15,7 +15,8 @@ Flask app with homepage, signup, MySQL, and password hashing.
 | Shokunbi Abdulfatah Ayodele | 2025/B/SENG/0422 | Software Engineering | Direct Entry | Flask–MySQL connection |
 | Adeleke Adegoke | 2024/B/SENG/0215 | Software Engineering | Direct Entry | Password hashing |
 | Joshua Asiribo | 2024/A/SENG/0009 | Software Engineering | UTME | Integration & testing |
-| Oluwatobi Ogunfowora | 2024/C/SENG/0735 | Software Engineering | Direct Entry | Documentation & submission |
+| Oluwatobi Ogunfowora | 2024/C/SENG/0735 | Software Engineering | Direct Entry | Documentation & submission (with Johnson) |
+| Johnson Olakunle Oluwasegun | 2025/A/SENG/0138 | Software Engineering | Direct Entry | Documentation & submission (with Oluwatobi) |
 
 ## Where to add your work
 
@@ -31,7 +32,7 @@ Each file has comments naming the person and task. Use them as a guide:
 | Flask–MySQL connection | `app.py` (DB config & insert) | Shokunbi Abdulfatah Ayodele |
 | Password hashing | `app.py` (signup route) | Adeleke Adegoke |
 | Integration & testing | Run app, test signup flow | Joshua Asiribo |
-| Documentation & submission | README, final deliverables | Oluwatobi Ogunfowora |
+| Documentation & submission | README, final deliverables | Oluwatobi Ogunfowora, Johnson Olakunle Oluwasegun |
 
 ## Submission deliverables
 
