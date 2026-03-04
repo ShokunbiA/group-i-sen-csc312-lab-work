@@ -40,16 +40,18 @@ Each file has comments naming the person and task. Use them as a guide:
 - `templates/signup.html` — Signup form
 - `database/create_tables.sql` — MySQL table creation script
 
-## Setup
+## Total setup: run and test
+
+Follow these steps in order to get the project running and test it.
 
 ### 1. Clone the repository
 
 ```bash
 git clone <repository-url>
-cd group-1-sen-csc312-lab-work
+cd group-i-sen-csc312-lab-work
 ```
 
-Replace `<repository-url>` with your actual repo URL (e.g. `https://github.com/username/group-1-sen-csc312-lab-work.git`).
+Replace `<repository-url>` with your actual repo URL (e.g. `https://github.com/username/group-i-sen-csc312-lab-work.git`). Use your actual folder name if different (e.g. `group-1-sen-csc312-lab-work`).
 
 ### 2. Python environment
 
@@ -59,25 +61,60 @@ source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. MySQL
+### 3. MySQL: install, create database, and table
 
-- Install MySQL and start the server.
-- **Full guide for the team:** see [DATABASE_SETUP.md](DATABASE_SETUP.md).
-- Create the database and table:
+- Install and start MySQL. **Full guide:** [DATABASE_SETUP.md](DATABASE_SETUP.md).
+- Create the database and `tbl_user` table:
 
 ```bash
 mysql -u root -p < database/create_tables.sql
 ```
 
-Or run the contents of `database/create_tables.sql` in MySQL Workbench / CLI.
+(Use `mysql -u root < database/create_tables.sql` if root has no password.) Or run the script in MySQL Workbench.
 
-### 4. Run
+### 4. Database config (optional)
+
+The app connects with:
+
+- **Host:** `localhost`
+- **User:** `root`
+- **Password:** *(empty by default)*
+- **Database:** `group1_lab_db`
+
+If your MySQL root user has a password, set it before running the app:
+
+```bash
+export MYSQL_PASSWORD=yourpassword    # macOS/Linux
+# Windows CMD: set MYSQL_PASSWORD=yourpassword
+# Windows PowerShell: $env:MYSQL_PASSWORD="yourpassword"
+```
+
+To use a different host, user, or database, set: `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_DATABASE`. See [DATABASE_SETUP.md](DATABASE_SETUP.md) for details.
+
+### 5. Run the app
+
+From the project folder (with venv activated):
 
 ```bash
 python app.py
 ```
 
-Open http://127.0.0.1:5000 — homepage; use “Sign Up” for registration.
+You should see something like: `Running on http://127.0.0.1:5000`.
+
+### 6. Test the project
+
+1. **Homepage:** Open http://127.0.0.1:5000 in a browser. You should see the welcome page and a “Sign Up” link.
+2. **Sign up:** Click “Sign Up”, enter a username (e.g. `testuser`) and password (at least 8 characters), then submit.
+3. **Success:** You should see a success message (e.g. “Account created for testuser”).
+4. **Optional — verify in MySQL:** Check that the user was stored:
+
+   ```bash
+   mysql -u root -p -e "USE group1_lab_db; SELECT id, username, created_at FROM tbl_user;"
+   ```
+
+   You should see your test user. The password is stored hashed, not in plain text.
+5. **Duplicate username:** Try signing up again with the same username; you should see “Username already taken”.
+6. **Validation:** Try submitting an empty username or a password shorter than 8 characters; you should see the corresponding error messages.
 
 ## Features
 

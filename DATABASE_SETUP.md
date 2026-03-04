@@ -87,14 +87,16 @@ Use the same `your_password` when running the script and in the app (see Step 4)
 
 ---
 
-## Step 4: Tell the Flask app how to connect
+## Step 4: Database config — tell the Flask app how to connect
 
-The app uses these defaults:
+The app reads connection settings from environment variables (see `app.py`). Defaults:
 
-- **User:** `root`
-- **Password:** *(empty)*
-- **Host:** `localhost`
-- **Database:** `group1_lab_db`
+| Variable          | Default        | Description   |
+|-------------------|----------------|---------------|
+| `MYSQL_HOST`      | `localhost`    | MySQL server  |
+| `MYSQL_USER`      | `root`         | MySQL user    |
+| `MYSQL_PASSWORD`  | *(empty)*      | MySQL password |
+| `MYSQL_DATABASE`  | `group1_lab_db`| Database name |
 
 If your MySQL root **has a password**, set it before running the app:
 
@@ -138,6 +140,22 @@ Refresh the left panel under your connection → **Schemas** → `group1_lab_db`
 | Task | Command / action |
 |------|------------------|
 | Run the script | `mysql -u root -p < database/create_tables.sql` |
-| Set app password | `export MYSQL_PASSWORD=yourpassword` (then run app) |
+| Set app password (macOS/Linux) | `export MYSQL_PASSWORD=yourpassword` (then run app) |
+| Set app password (Windows CMD) | `set MYSQL_PASSWORD=yourpassword` (then run app) |
+| Set app password (Windows PowerShell) | `$env:MYSQL_PASSWORD="yourpassword"` (then run app) |
 | Start MySQL (Mac) | `brew services start mysql` |
 | Start MySQL (Linux) | `sudo systemctl start mysql` |
+| Start MySQL (Windows) | **Services:** Win + R → `services.msc` → find "MySQL" or "MySQL80" → Start. **Or** CMD (Admin): `net start MySQL80` (use your service name if different). |
+
+---
+
+## Run and test
+
+After the database and table exist and (if needed) `MYSQL_PASSWORD` is set:
+
+1. From the project folder with venv activated: `python app.py`
+2. Open http://127.0.0.1:5000 — check the homepage and click “Sign Up”
+3. Submit a username and password (8+ chars) and confirm you see a success message
+4. Optionally verify: `mysql -u root -p -e "USE group1_lab_db; SELECT * FROM tbl_user;"`
+
+For full setup and testing steps, see the README.

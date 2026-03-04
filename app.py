@@ -1,146 +1,104 @@
 """
 Group I - SEN CSC312 Lab Work (Web Application Development)
-Flask app: homepage, signup, MySQL, password hashing.
+Flask app: homepage, signup with validation, MySQL, password hashing.
 
 Ayodele Samuel Adebayo: Project setup & Flask init — ensure Flask is installed (see requirements.txt)
 and the app is initialised below.
 """
 
-from flask import Flask, render_template, request, jsonify
-from flask_mysqldb import MySQL 
+import os
+from flask import Flask, render_template, request, redirect, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
-from flask import current_app
-from werkzeug.security import generate_password_hash
 
 # ---------------------------------------------------------------------------
 # Ayodele Samuel Adebayo: Project setup & Flask init — initialise Flask here.
 # ---------------------------------------------------------------------------
 app = Flask(__name__)
-app.secret_key = "change-this-in-production"
-app.config['MYSQL_HOST'] = '127.0.0.1'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = ''
-app.config['MYSQL_PORT'] = 3306
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 
 # ---------------------------------------------------------------------------
+# Shokunbi Abdulfatah Ayodele: Flask–MySQL connection — DB config and get_db_connection().
+# ---------------------------------------------------------------------------
+DB_CONFIG = {
+    "host": os.environ.get("MYSQL_HOST", "localhost"),
+    "user": os.environ.get("MYSQL_USER", "root"),
+    "password": os.environ.get("MYSQL_PASSWORD", ""),
+    "database": os.environ.get("MYSQL_DATABASE", "group1_lab_db"),
+}
+
+
 def get_db_connection():
+    """Create and return a MySQL connection."""
     try:
-        connection = mysql.connector.connect(
-            host=current_app.config['MYSQL_HOST'],
-            user=current_app.config['MYSQL_USER'],
-            password=current_app.config['MYSQL_PASSWORD'],
-            database=current_app.config['MYSQL_DB'],
-            port=current_app.config.get('MYSQL_PORT', 3306),
-            autocommit=False
-        )
-
-        return connection
-
+        return mysql.connector.connect(**DB_CONFIG)
     except Error as e:
-        print(f"Connection error: {e}")
+        print(f"Database connection error: {e}")
         return None
-    
-# Shokunbi Abdulfatah Ayodele: Flask–MySQL connection
-# Add: import mysql.connector (and Error from mysql.connector).
-# Add: DB config (host, user, password, database) and a function get_db_connection()
-# that returns a MySQL connection. Connect Flask to MySQL using mysql.connector.
-# ---------------------------------------------------------------------------
+
 
 @app.route("/")
 def index():
-    """Homepage — renders index.html."""
+    """Homepage."""
     return render_template("index.html")
 
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    """Signup: GET shows form; POST should validate, hash password, and save to DB."""
+    """Signup: GET shows form, POST validates and stores user (hashed password)."""
     if request.method == "GET":
         return render_template("signup.html")
 
     # -----------------------------------------------------------------------
-    # Ukwesa Kelvin: Form validation & signup route
-    # Get username and password from request.form. Validate (e.g. required,
-    # min length). If invalid, return render_template("signup.html", error="...")
-    # with appropriate status code. Only proceed to DB when valid.
+    # Ukwesa Kelvin: Form validation & signup route — validate request.form.
     # -----------------------------------------------------------------------
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "")
+
+    if not username:
+        return render_template("signup.html", error="Username is required."), 400
+    if len(username) < 3 or len(username) > 255:
+        return render_template("signup.html", error="Username must be 3–255 characters."), 400
+    if not password:
+        return render_template("signup.html", error="Password is required."), 400
+    if len(password) < 8:
+        return render_template("signup.html", error="Password must be at least 8 characters."), 400
 
     # -----------------------------------------------------------------------
-    # Adeleke Adegoke: Password hashing
-    # Before storing, hash the password using werkzeug.security.generate_password_hash.
-    # Store only the hashed value in the database, never the plain password.
+    # Adeleke Adegoke: Password hashing — hash before storing in DB.
     # -----------------------------------------------------------------------
+    password_hash = generate_password_hash(password, method="scrypt")
 
     # -----------------------------------------------------------------------
-@app.route("/createuser", methods=["POST"])
-def createUser():
-    connection = get_db_connection()
-
-    if not connection:
-        return jsonify({"error": "Database connection failed"}), 500
+    # Shokunbi Abdulfatah Ayodele: Flask–MySQL connection — insert into tbl_user.
+    # -----------------------------------------------------------------------
+    conn = get_db_connection()
+    if not conn:
+        return render_template("signup.html", error="Database unavailable. Try again later."), 503
 
     try:
-        data = request.json
-        username = data.get("username")
-        password = data.get("password")
-
-        # Basic validation
-        if not username or not password:
-            return jsonify({"error": "Username and password are required"}), 400
-
-        cursor = connection.cursor()
-
-        # 1️⃣ Check if user already exists
-        cursor.execute(
-            "SELECT username FROM tbl_user WHERE username = %s",
-            (username,)
-        )
-        user = cursor.fetchone()
-
-        if user:
-            return jsonify({"error": f"{username} already taken"}), 400
-
-        # 2️⃣ Insert new user
+        cursor = conn.cursor()
         cursor.execute(
             "INSERT INTO tbl_user (username, password) VALUES (%s, %s)",
-            (username, generate_password_hash(password))
+            (username, password_hash),
         )
-
-        connection.commit()  # Commit the transaction
-
-        return jsonify({"message": "User created successfully"}), 201
-
-    except Exception as e:
-        if connection:
-            connection.rollback()  # Rollback on error
-        return jsonify({"error": str(e)}), 500
-
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return render_template("signup.html", success=f"Account created for {username}. You can sign in.")
+    except Error as e:
+        if e.errno == 1062:  # duplicate entry
+            return render_template("signup.html", error="Username already taken."), 400
+        print(f"Database error: {e}")
+        return render_template("signup.html", error="Could not create account. Try again."), 500
     finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
- 
-    # Shokunbi Abdulfatah Ayodele: Flask–MySQL connection
-    # Use get_db_connection() to get a connection, then INSERT into tbl_user
-    # (username, password). Use the hashed password. Handle duplicate username
-    # (e.g. show "Username already taken"). Close the connection when done.
-    # -----------------------------------------------------------------------
+        if conn and conn.is_connected():
+            conn.close()
 
-    # Placeholder until the above is implemented:
-    return render_template(
-        "signup.html",
-        error="Signup not implemented yet — add validation, hashing, and DB insert (see comments in app.py).",
-    ), 501
 
 # ---------------------------------------------------------------------------
-# Joshua Asiribo: Integration & testing
-# After all members have added their code, run: python app.py
-# Test: open homepage, go to signup, submit username and password, confirm
-# the user is stored in MySQL (e.g. SELECT * FROM tbl_user;). Fix any bugs.
+# Joshua Asiribo: Integration & testing — run app, test signup flow end-to-end.
 # ---------------------------------------------------------------------------
-
 if __name__ == "__main__":
     app.run(debug=True)
