@@ -7,16 +7,14 @@ Flask app with homepage, signup, MySQL, and password hashing.
 
 | Name | Matric | Department | Admission type | Task area |
 |------|--------|------------|----------------|-----------|
-| Ayodele Samuel Adebayo | 2023/A/SENG/0086 | Software Engineering | UTME | Project setup & Flask init |
+| Shokunbi Abdulfatah Ayodele | 2025/B/SENG/0422 | Software Engineering | Direct Entry | Flask–MySQL connection |
 | OMALE JEREMIAH OGWUCHE | 2024/A/SENG/0160 | Software Engineering | UTME | Homepage (index.html) |
 | Wisdom Jonathan | 2024/C/SENG/0763 | Software Engineering | Direct Entry | Signup page (signup.html) |
 | Ukwesa Kelvin | 2025/A/SENG/0394 | Software Engineering | Direct Entry | Form validation & signup route |
 | Ojo Abiola Victoria | 2024/B/SENG/0255 | Software Engineering | Direct Entry | MySQL table creation script |
-| Shokunbi Abdulfatah Ayodele | 2025/B/SENG/0422 | Software Engineering | Direct Entry | Flask–MySQL connection |
 | Adeleke Adegoke | 2024/B/SENG/0215 | Software Engineering | Direct Entry | Password hashing |
 | Joshua Asiribo | 2024/A/SENG/0009 | Software Engineering | UTME | Integration & testing |
 | Oluwatobi Ogunfowora | 2024/C/SENG/0735 | Software Engineering | Direct Entry | Documentation & submission (with Johnson) |
-| Johnson Olakunle Oluwasegun | 2025/A/SENG/0138 | Software Engineering | Direct Entry | Documentation & submission (with Oluwatobi) |
 
 ## Where to add your work
 
